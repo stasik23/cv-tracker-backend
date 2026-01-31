@@ -1,5 +1,5 @@
 #!/bin/sh
-
+echo "YPre-commit is running"
 branch="$(git rev-parse --abbrev-ref HEAD)"
 
 if [ "$branch" = "master" ]; then
