@@ -23,10 +23,5 @@
     "husky": "^9.1.7",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "sh hooks/pre-commit"
-    }
   }
 }
