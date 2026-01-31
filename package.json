@@ -1,0 +1,32 @@
+{
+  "name": "cv-tracker",
+  "version": "1.0.0",
+  "description": "TEST",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stasik23/cv-tracker-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stasik23/cv-tracker-backend/issues"
+  },
+  "homepage": "https://github.com/stasik23/cv-tracker-backend#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.2.1",
+    "husky": "^9.1.7",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "sh hooks/pre-commit"
+    }
+  }
+}
