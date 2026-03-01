@@ -1,8 +1,10 @@
-const express = require('express');
-const axios = require('axios');
+import express from 'express';
+import 'dotenv/config'
+import axios from 'axios';
+
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
@@ -26,6 +28,6 @@ app.get('/api/message', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server started at port http://localhost:${PORT}`);
-  console.log(`Check route: http://localhost:${PORT}/api/message`);
+    console.log(`Server started at port http://localhost:${PORT}`);
+    console.log(`Check route: http://localhost:${PORT}/api/message`);
 });
