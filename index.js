@@ -18,7 +18,7 @@ app.get('/api/message', async (req, res) => {
     });
   } catch (error) {
     res.json({
-      message: 'Express backend succesfully started!',
+      message: 'Express backend succesfully started! Kostia very cool',
       status: 'Working is well',
       timestamp: new Date().toLocaleString('ru-RU')
     });
