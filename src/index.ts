@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import {dbConnect} from "./db/db";
+import {dbConnect} from "./db";
 import { logger } from './middleware/logger';
 
 const app: Express = express();
