@@ -6,7 +6,7 @@ const PORT: number = 3000;
 app.use(express.json());
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.DOMAIN_CLIENT,
 }));
 
 app.get('/api/message', async (req: Request, res: Response): Promise<void> => {
