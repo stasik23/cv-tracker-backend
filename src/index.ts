@@ -1,9 +1,19 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
+import 'dotenv/config';
+import {dbConnect} from "./db";
+import { logger } from './middleware/logger';
+
 const app: Express = express();
+
+
 const PORT: number = 3000;
 
 app.use(express.json());
+
+app.use(logger);
+
+dbConnect();
 
 app.use(cors({
   origin: process.env.DOMAIN_CLIENT,
