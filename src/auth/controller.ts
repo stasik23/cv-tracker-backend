@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcrypt"
-import session from "express-session"
+// import session from "express-session"
 import { User } from "../models/user.model";
 import { getUserByEmailService, userCreateService } from "../user/service"
 
@@ -36,14 +36,14 @@ authRouter.post("/register", async (req, res) => {
 
 })
 
-authRouter.get("/logout", (req, res) => {
-    console.log("logout")
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).send("Error logging out")
-        }
-    })
-})
+// authRouter.get("/logout", (req, res) => {
+//     console.log("logout")
+//     req.session.destroy((err) => {
+//         if (err) {
+//             return res.status(500).send("Error logging out")
+//         }
+//     })
+// })
 
 authRouter.post("/login", async (req, res) => {
     console.log("login")
@@ -66,13 +66,13 @@ authRouter.post("/login", async (req, res) => {
         // req.session.user = {
         //     id: existedUser._id.toString(),
         // }
-        res.json({
-            user: {
-                id: existedUser._id.toString(),
-                email: existedUser.email,
-            }
-        })
-        return res.json("Login is successful")
+        // res.json({
+        //     user: {
+        //         id: existedUser._id.toString(),
+        //         email: existedUser.email,
+        //     }
+        // })
+        return res.status(200).json({ message: "Login is successful" })
     } catch (error) {
         console.error(error)
     }
