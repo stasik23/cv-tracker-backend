@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { User } from "../models/user.model.js";
+import { User } from "../models/user.model";
+import { Request, Response } from "express";
 
 const userRouter = Router()
-userRouter.post("/", async ({ req, res }: any) => {
+userRouter.post("/", async (req: Request, res: Response) => {
     try {
         const { firstName, lastName, email } = req.body
 

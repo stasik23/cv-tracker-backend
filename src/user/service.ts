@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt"
-import { User, IUser } from "../models/user.model.js"
+import { User, IUser } from "../models/user.model"
 
 export const userCreateService = async ({ firstName, lastName, email, password }: IUser) => {
+    console.log({ firstName, lastName, email, password });
+    
     try {
         if (!password || typeof password !== 'string') {
             throw new Error("Password is required and must be a string")
@@ -12,7 +14,7 @@ export const userCreateService = async ({ firstName, lastName, email, password }
             firstName,
             lastName,
             email,
-            hashedPassword
+            password: hashedPassword,
         }
         return User.create(newUser)
     }
