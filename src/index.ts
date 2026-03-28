@@ -62,6 +62,6 @@ app.post('/api/message', async (req: Request, res: Response): Promise<void> => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server started at port http://localhost:${PORT}`);
-  console.log(`Check route: http://localhost:${PORT}/api/message`);
+	console.log(`Server started at port http://localhost:${PORT}`);
+	console.log(`Check route: http://localhost:${PORT}/api/message`);
 });
