@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export async function dbConnect() {
 	try {
-		const url: string | undefined = process.env.DATABASE_URL;
+		const url: string | undefined = 'mongodb://localhost:27017/cv-tracker';
 
 		if (!url) {
 			throw new Error("DATABASE_URL is not defined");
