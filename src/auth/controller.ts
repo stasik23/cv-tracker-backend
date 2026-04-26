@@ -23,7 +23,7 @@ authRouter.get("/check-auth", async (req, res) => {
 
 authRouter.post("/register", async (req, res) => {
     try {
-        const { firstName, lastName, email, password, confirmPassword } = req.body
+        const { firstName, lastName, email, password } = req.body
         console.log(req.body);
 
         const existingUser = await getUserByEmailService(email)
@@ -32,9 +32,6 @@ authRouter.post("/register", async (req, res) => {
         if (existingUser) {
             throw new Error("User with this email already exists")
         }
-        // if (password !== confirmPassword) {
-        //     throw new Error("Passwords do not match")
-        // }
 
         const result = await userCreateService({ firstName, lastName, email, password })
         console.log(result);
