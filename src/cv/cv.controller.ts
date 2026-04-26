@@ -10,7 +10,7 @@ export class CVController {
 		res.json(cvList);
 	}
 	async createCV(req: Request, res: Response): Promise<void> {
-		const userId = "69bfb0cf7d1c3f6580563ec5";
+		const userId = req.session?.user?.id as string;
 		const {
 			title,
 			summary,
