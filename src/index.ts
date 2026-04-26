@@ -1,14 +1,16 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-// import MongoStore from 'connect-mongo';
+
+import MongoStore from 'connect-mongo';
 import { dbConnect } from "./db";
 import { logger } from './middleware/logger';
 import { authRouter } from './auth/controller';
-// import session from 'express-session';
+
 import {CVController} from  "./cv/cv.controller";
 import {CVService} from "./cv/cv.service";
 import dotenv from 'dotenv'
+import session from 'express-session';
 
 const app: Express = express();
 
@@ -50,6 +52,21 @@ app.post("/api/cv", async (req: Request, res: Response): Promise<void> => {
 //     ttl: 14 * 24 * 60 * 60 // 14 days in seconds
 //   })
 // }));
+
+app.use(session({
+  secret: process.env.SECRET || 'foo',
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days in milliseconds
+  },
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoUrl,
+    dbName: "session",
+    ttl: 14 * 24 * 60 * 60 // 14 days in seconds
+  })
+}));
 
 app.get('/api/message', async (req: Request, res: Response): Promise<void> => {
   try {
