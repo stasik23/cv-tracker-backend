@@ -6,6 +6,9 @@ import MongoStore from 'connect-mongo';
 import { dbConnect } from "./db";
 import { logger } from './middleware/logger';
 import { authRouter } from './auth/controller';
+
+import {CVController} from  "./cv/cv.controller";
+import {CVService} from "./cv/cv.service";
 import dotenv from 'dotenv'
 import session from 'express-session';
 
@@ -26,6 +29,29 @@ dbConnect();
 app.use(cors({
   origin: process.env.DOMAIN_CLIENT,
 }));
+const cvService = new CVService();
+const cvController = new CVController(cvService);
+
+app.get("/api/cv", async (req: Request, res: Response): Promise<void> => {
+    cvController.getCV(req, res);
+});
+app.post("/api/cv", async (req: Request, res: Response): Promise<void> => {
+    cvController.createCV(req, res);
+});
+// app.use(session({
+//   secret: process.env.SECRET || 'foo',
+//   cookie: {
+//     secure: process.env.NODE_ENV === 'production',
+//     maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days in milliseconds
+//   },
+//   resave: false,
+//   saveUninitialized: false,
+//   store: MongoStore.create({
+//     mongoUrl: mongoUrl,
+//     dbName: "session",
+//     ttl: 14 * 24 * 60 * 60 // 14 days in seconds
+//   })
+// }));
 
 app.use(session({
   secret: process.env.SECRET || 'foo',
