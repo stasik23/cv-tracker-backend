@@ -1,14 +1,23 @@
 import { Router } from "express";
 import bcrypt from "bcrypt"
-// import session from "express-session"
 import { User } from "../models/user.model";
 import { getUserByEmailService, userCreateService } from "../user/service"
+import { sendEmail } from "./email.service";
+import { SessionData } from "express-session";
+import { isAuth } from "../middleware/isAuth";
 
 
+const mailOptions = {
+    from: 'kolesnikkosta572@email.com',
+    to: 'kolesnikkosta572@email.com',
+    subject: 'Sending Email using Node.js',
+    text: 'That was easy!'
+};
 
 const authRouter = Router()
 
-authRouter.get("/check-auth", (req, res) => {
+authRouter.get("/check-auth", async (req, res) => {
+    await sendEmail(mailOptions)
     return res.json('ok')
 })
 
@@ -16,10 +25,10 @@ authRouter.post("/register", async (req, res) => {
     try {
         const { firstName, lastName, email, password, confirmPassword } = req.body
         console.log(req.body);
-        
+
         const existingUser = await getUserByEmailService(email)
         console.log(existingUser);
-        
+
         if (existingUser) {
             throw new Error("User with this email already exists")
         }
@@ -31,19 +40,21 @@ authRouter.post("/register", async (req, res) => {
         console.log(result);
         return res.json({ user: result })
     } catch (error) {
-        return res.status(400).json({ error })
+        return res.status(400).json({ message: "An error occurred during registration", error })
     }
 
 })
 
-// authRouter.get("/logout", (req, res) => {
-//     console.log("logout")
-//     req.session.destroy((err) => {
-//         if (err) {
-//             return res.status(500).send("Error logging out")
-//         }
-//     })
-// })
+authRouter.get("/logout", (req, res) => {
+    console.log("logout")
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send("Error logging out")
+        }else   {
+            return res.status(200).send("Logout successful")
+        }
+    })
+})
 
 authRouter.post("/login", async (req, res) => {
     console.log("login")
@@ -59,22 +70,30 @@ authRouter.post("/login", async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(password, existedUser.password)
 
         if (!isPasswordCorrect) {
-            throw new Error("Credentials are not correct")
+            return res.status(401).json({ message: "Credentials are not correct" })
         }
 
-
-        // req.session.user = {
-        //     id: existedUser._id.toString(),
-        // }
-        // res.json({
-        //     user: {
-        //         id: existedUser._id.toString(),
-        //         email: existedUser.email,
-        //     }
-        // })
+        (req.session as SessionData).user = {
+            id: existedUser._id.toString(),
+        }
         return res.status(200).json({ message: "Login is successful" })
     } catch (error) {
-        console.error(error)
+        console.log(error)
+        return res.status(400).json({ message: "An error occurred during login", error })
+    }
+})
+
+authRouter.get('/profile', async (req, res) => {
+    try {
+        isAuth(req, res, () => {
+            const sessionId = req?.session?.user?.id
+            console.log("profile: ", sessionId);
+            return res.json({ message: "You are authenticated", userId: sessionId })
+        })
+
+    }catch (error) {
+        console.log(error)
+        return res.status(400).json({ message: "An error occurred while fetching profile", error })
     }
 })
 
