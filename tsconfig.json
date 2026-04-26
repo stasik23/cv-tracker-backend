@@ -2,10 +2,11 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "CommonJS",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "lib": [
       "ESNext"
-    ],
+    ],  
+
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
@@ -19,10 +20,10 @@
     "sourceMap": true,
     "removeComments": true
   },
-  "include": [
-    "src/**/*",
-    "src/**/*.d.ts"
-  ],
+  "ts-node": {
+    "files": true
+  },
+ "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     "dist"
