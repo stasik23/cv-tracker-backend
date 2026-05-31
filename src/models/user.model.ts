@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
+import { Document } from "mongoose";
 
 export interface IUserSettings {
-    theme?: string;
-    language?: string;
+  theme?: string;
+  language?: string;
 }
 
-export interface IUser {
+export interface IUser extends Document {
   firstName?: string;
   lastName: string;
   email: string;
@@ -14,6 +15,8 @@ export interface IUser {
   avatarUrl?: string;
   createdAt?: Date;
   settings?: IUserSettings;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: number;
 }
 
 const userSchema = new mongoose.Schema<IUser>({

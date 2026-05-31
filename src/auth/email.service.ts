@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-// Create a transporter object
 interface MailOptions {
     from: string;
     to: string;
@@ -8,18 +7,19 @@ interface MailOptions {
 }
 
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Shortcut for Gmail's SMTP settings - see Well-Known Services
+  service: "gmail",
   auth: {
     type: "OAuth2",
-    user: "kolesnikkosta572@email.com",
+    user: "kolesnikkosta572@gmail.com",
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     refreshToken: process.env.REFRESH_TOKEN,
+    accessToken: process.env.ACCESS_TOKEN_SECRET,
   },
 });
 
-// Send the email
 export const sendEmail = async (mailOptions: MailOptions): Promise<void> => {
+    console.log(mailOptions);
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log('Error:', error);

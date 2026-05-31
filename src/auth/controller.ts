@@ -6,11 +6,12 @@ import { getUserByEmailService, userCreateService } from "../user/service"
 import { sendEmail } from "./email.service";
 import { SessionData } from "express-session";
 import { isAuth } from "../middleware/isAuth";
+import { forgotPassword, resetPassword } from "./auth.service";
 
 
 const mailOptions = {
-    from: 'kolesnikkosta572@email.com',
-    to: 'kolesnikkosta572@email.com',
+    from: 'kolesnikkosta572@gmail.com',
+    to: 'kolesnikkosta572@gmail.com',
     subject: 'Sending Email using Node.js',
     text: 'That was easy!'
 };
@@ -20,6 +21,26 @@ const authRouter = Router()
 authRouter.get("/check-auth", async (req, res) => {
     await sendEmail(mailOptions)
     return res.json('ok')
+})
+
+authRouter.post("/forgot-password", async (req, res) => {
+    try {
+        await forgotPassword(req, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ message: "An error occurred during password reset", error })
+    }
+})
+
+authRouter.post('/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword, email } = req.body;
+        await resetPassword(token, newPassword, email);
+        return res.json({ message: "Password reset successful" });
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ message: "An error occurred during password reset", error })
+    }
 })
 
 authRouter.post("/register", async (req, res) => {
@@ -34,7 +55,7 @@ authRouter.post("/register", async (req, res) => {
             throw new Error("User with this email already exists")
         }
 
-        const result = await userCreateService({ firstName, lastName, email, password })
+        const result = await userCreateService({ firstName, lastName, email, password } as any)
         console.log(result);
         return res.json({ user: result })
     } catch (error) {
@@ -48,7 +69,7 @@ authRouter.get("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             return res.status(500).send("Error logging out")
-        }else   {
+        } else {
             return res.status(200).send("Logout successful")
         }
     })
@@ -89,7 +110,7 @@ authRouter.get('/profile', async (req, res) => {
             return res.json({ message: "You are authenticated", userId: sessionId })
         })
 
-    }catch (error) {
+    } catch (error) {
         console.log(error)
         return res.status(400).json({ message: "An error occurred while fetching profile", error })
     }
