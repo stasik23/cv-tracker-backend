@@ -24,7 +24,7 @@ app.use(logger);
 dbConnect();
 
 app.use(cors({
-  origin: process.env.DOMAIN_CLIENT,
+  origin: process.env.DOMAIN_CLIENT || '*',
 }));
 
 app.use(session({

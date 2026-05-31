@@ -7,6 +7,7 @@ const SECONDS_IN_M = 60
 const EXPIRED_TIME = 2
 const MS_IN_S = 1000
 
+
 export const forgotPassword = async (req: Request, res: Response) => {
     try {
         const { email } = req.body;
@@ -18,7 +19,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
         const resetToken = crypto.randomBytes(32).toString("hex");
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = Date.now() + SECONDS_IN_M * EXPIRED_TIME * MS_IN_S;
+        console.log(user.resetPasswordExpires, "resetPasswordExpires");
         await user.save();
+        console.log("User after setting reset token:", user);
 
         const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
         const mailOptions = {
@@ -41,10 +44,14 @@ export const validateResetToken = async (token: string, email: string): Promise<
             // resetPasswordToken: token,
             // resetPasswordExpires: { $gt: Date.now() }
         });
-        console.log(user?.resetPasswordExpires);
-        
+        console.log("User found for token validation:", user);
+
+        const passTokenTime = new Date(user?.resetPasswordExpires || 0).getTime()
+        console.log(Date.now(), "current time");
+        console.log(passTokenTime, "condition token expiration time");
+
         if (user?.resetPasswordExpires) {
-            if (user?.resetPasswordExpires + SECONDS_IN_M * EXPIRED_TIME * MS_IN_S < Date.now()) {
+            if (passTokenTime + SECONDS_IN_M * EXPIRED_TIME * MS_IN_S > Date.now()) {
                 console.log(user);
                 return user
             } else {
@@ -52,12 +59,46 @@ export const validateResetToken = async (token: string, email: string): Promise<
             }
         }
         return null
-        // 3000ms = data
-        // data + 3m < date.now() => move forward
     } catch (err: any) {
         throw new Error(err.message)
     }
 
+}
+
+export const registerUserService = async ({ firstName, lastName, email, password }: Partial<IUser>) => {
+    const existingUser = await User.findOne({ email })
+    if (existingUser) {
+        throw new Error("User with this email already exists")
+    }
+    if (!password || typeof password !== 'string') {
+        throw new Error("Password is required and must be a string")
+    }
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+    return User.create({ firstName, lastName, email, password: hashedPassword })
+}
+
+export const loginUserService = async (email: string, password: string) => {
+    const user = await User.findOne({ email })
+        if (user?.accountLockedUntil && user?.accountLockedUntil > new Date()) {
+            throw new Error("Account is locked. Please try again later."+ user.accountLockedUntil);
+        }
+    if (!user) {
+        throw new Error("User not found")
+    }
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
+    if (!isPasswordCorrect) {
+        user.unSuccessfulLoginAttempts += 1;
+        if (user.unSuccessfulLoginAttempts >= 5) {
+            user.accountLockedUntil = new Date(Date.now() + 10 * 60 * 1000);
+        }
+        await user.save();
+        throw new Error("Credentials are not correct")
+    }
+    user.unSuccessfulLoginAttempts = 0;
+    user.accountLockedUntil = null;
+    await user.save();
+    return user
 }
 
 export const resetPassword = async (token: string, newPassword: string, email: string): Promise<void> => {

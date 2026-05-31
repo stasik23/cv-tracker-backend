@@ -6,7 +6,7 @@ import { getUserByEmailService, userCreateService } from "../user/service"
 import { sendEmail } from "./email.service";
 import { SessionData } from "express-session";
 import { isAuth } from "../middleware/isAuth";
-import { forgotPassword, resetPassword } from "./auth.service";
+import { forgotPassword, loginUserService, registerUserService, resetPassword } from "./auth.service";
 
 
 const mailOptions = {
@@ -46,22 +46,11 @@ authRouter.post('/reset-password', async (req, res) => {
 authRouter.post("/register", async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body
-        console.log(req.body);
-
-        const existingUser = await getUserByEmailService(email)
-        console.log(existingUser);
-
-        if (existingUser) {
-            throw new Error("User with this email already exists")
-        }
-
-        const result = await userCreateService({ firstName, lastName, email, password } as any)
-        console.log(result);
+        const result = await registerUserService({ firstName, lastName, email, password })
         return res.json({ user: result })
-    } catch (error) {
-        return res.status(400).json({ message: "An error occurred during registration", error })
+    } catch (error: any) {
+        return res.status(400).json({ message: error.message })
     }
-
 })
 
 authRouter.get("/logout", (req, res) => {
@@ -76,29 +65,13 @@ authRouter.get("/logout", (req, res) => {
 })
 
 authRouter.post("/login", async (req, res) => {
-    console.log("login")
-
     try {
         const { password, email } = req.body
-        const existedUser = await User.findOne({ email })
-
-        if (!existedUser) {
-            throw new Error("User not found")
-        }
-
-        const isPasswordCorrect = await bcrypt.compare(password, existedUser.password)
-
-        if (!isPasswordCorrect) {
-            return res.status(401).json({ message: "Credentials are not correct" })
-        }
-
-        (req.session as SessionData).user = {
-            id: existedUser._id.toString(),
-        }
+        const user = await loginUserService(email, password)
+        ;(req.session as SessionData).user = { id: user._id.toString() }
         return res.status(200).json({ message: "Login is successful" })
-    } catch (error) {
-        console.log(error)
-        return res.status(400).json({ message: "An error occurred during login", error })
+    } catch (error: any) {
+        return res.status(400).json({ message: error.message })
     }
 })
 

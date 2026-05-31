@@ -16,7 +16,9 @@ export interface IUser extends Document {
   createdAt?: Date;
   settings?: IUserSettings;
   resetPasswordToken?: string;
-  resetPasswordExpires?: number;
+  resetPasswordExpires?: any;
+  unSuccessfulLoginAttempts: number;
+  accountLockedUntil: Date | null;
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -28,6 +30,10 @@ const userSchema = new mongoose.Schema<IUser>({
   avatarUrl: { type: String },
   createdAt: { type: Date, default: Date.now },
   settings: { type: Object },
+  resetPasswordExpires: { type: Date },
+  resetPasswordToken: { type: String },
+  unSuccessfulLoginAttempts: { type: Number, default: 0 },
+  accountLockedUntil: { type: Date, default: null },
 });
 
 export const User = mongoose.model<IUser>('User', userSchema);
